@@ -1,63 +1,28 @@
-import { useState, useEffect } from 'react'
+
 import './App.css';
-
-//import api
-import axios from './api/cvbApi';
-import CvbCategoryLish from './components/CvbCategoryLish';
-import CvbCategoryForm from './components/CvbCategoryForm';
-
-
-
+import CvbListUsers from './components/CvbListUsers';
+import axios from './api/cvbApi'
+import { useEffect, useState } from 'react';
 function CvbApp() {
-  /// lấy dữu liệu từ api
-  const [cvbCategories, setCvbCategories] = useState([]);
+  const [cvbListUsers,setCvbListUsers] = useState([]);
 
-  const getCategories = async () => {
-    try {
-      const cvbCateResponse = await axios.get("cvbCategory");
-      setCvbCategories(cvbCateResponse.data);
-    } catch (error) {
-      console.log("lỗi:", error);
-    }
+  // đọc dữ liệu từ api
+  const cvbGetAllUsers = async  ()=>{
+    const cvbResponse = await axios.get("cvbUsers");
+    console.log("Api Data:",cvbResponse.data);
+    setCvbListUsers(cvbResponse.data)
   }
-    useEffect(() => {
-      getCategories();
-      console.log("cvbCategories:", cvbCategories);
-    }, [])
+ 
+  useEffect(()=>{
+    cvbGetAllUsers();
+  },[])
+  return (
+    <div className="container border my-3">
+         <h1>Làm việc với Mock Api</h1>
+         <hr/>
+         <CvbListUsers renderCvbListUsers={cvbListUsers}/>
+    </div>
+  );
+}
 
-    // trạng thái form
-    const [cvbCategoryIsForm, setCvbCategoryIsform]= useState(false);
-    const cvbHandleAddNew = (param )=>{
-      setCvbCategoryIsform(param);
-    }
-    const cvbHandleCategoryCloseForm=(param)=>{
-      setCvbCategoryIsform(param);
-    }
-    
-    const cvbHandleCategorySubmit = (param) => {
-      let lastId = parseInt(cvbCategories[cvbCategories.length - 1].cvbId, 10);
-      console.log("Mã ", lastId);
-      param.cvbId = lastId + 1;
-      cvbCategories.push(param);
-      setCvbCategories((prev) => [...prev]);
-      setCvbCategoryIsform(false);
-    };
-
-
-    return (
-      <div className="container border my-3">
-        <h1>Cao Văn Bình - CAll Api</h1>
-        <CvbCategoryLish renderCvbCategories={cvbCategories}
-                        onAddNew={cvbHandleAddNew}/>
-        <hr/>
-        {
-        cvbCategoryIsForm===true?<CvbCategoryForm 
-                                                onCloseForm={cvbHandleCategoryCloseForm}
-                                                onCategorySubmit={cvbHandleCategorySubmit}/>:""
-        }
-      </div>
-    );
-  }
-   
-export default CvbApp
-
+export default CvbApp;
